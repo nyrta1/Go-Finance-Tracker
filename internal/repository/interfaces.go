@@ -15,4 +15,8 @@ type (
 		GetByID(id uint) (*models.Role, error)
 		GetByName(name string) (*models.Role, error)
 	}
+	FinanceRepo interface {
+		GetAll(userID int) (*[]models.FinanceRecord, error)
+		Create(record *models.FinanceRecord) error
+	}
 )

@@ -7,12 +7,14 @@ import (
 )
 
 type Routers struct {
-	authHandler handler.AuthHandlers
+	authHandler    *handler.AuthHandlers
+	financeHandler *handler.FinanceHandlers
 }
 
-func NewRouters(authHandler handler.AuthHandlers) *Routers {
+func NewRouters(authHandler *handler.AuthHandlers, financeHandler *handler.FinanceHandlers) *Routers {
 	return &Routers{
-		authHandler: authHandler,
+		authHandler:    authHandler,
+		financeHandler: financeHandler,
 	}
 }
 
@@ -25,6 +27,11 @@ func (r *Routers) SetupRoutes(app *gin.Engine) {
 			authRouter.POST("/login", r.authHandler.Login)
 			authRouter.POST("/logout", middleware.RequireAuthMiddleware, r.authHandler.Logout)
 			authRouter.GET("/profile", middleware.RequireAuthMiddleware, r.authHandler.Profile)
+		}
+		financeRouter := v1Router.Group("/finance", middleware.RequireAuthMiddleware)
+		{
+			financeRouter.GET("", r.financeHandler.GetAllFinance)
+			financeRouter.POST("", r.financeHandler.AddFinanceRecord)
 		}
 	}
 }

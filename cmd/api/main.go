@@ -38,12 +38,14 @@ func main() {
 
 	userRepo := repository.NewUserRepository(dbInstance)
 	roleRepo := repository.NewRoleRepository(dbInstance)
+	financeRepo := repository.NewUserFinanceRepository(dbInstance)
 
 	authHandlers := handler.NewAuthHandler(userRepo, roleRepo)
+	financeHandlers := handler.NewFinanceHandlers(financeRepo)
 
 	r := gin.Default()
 
-	router := routers.NewRouters(*authHandlers)
+	router := routers.NewRouters(authHandlers, financeHandlers)
 	router.SetupRoutes(r)
 	r.Use(rateLimitMiddleware())
 
