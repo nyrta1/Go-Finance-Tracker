@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-finance-tracker/internal/models"
 	"go-finance-tracker/internal/repository"
-	"go-finance-tracker/internal/rest/dto"
+	"go-finance-tracker/internal/rest/form"
 	"go-finance-tracker/pkg/logger"
 	"net/http"
 	"strconv"
@@ -67,8 +67,8 @@ func (h *FinanceHandlers) AddFinanceRecord(ctx *gin.Context) {
 	}
 	userID, _ := strconv.Atoi(userIdStr.(string))
 
-	var financeDTO form.FinanceRecordInput
-	if err := ctx.ShouldBindJSON(&financeDTO); err != nil {
+	var financeForm form.FinanceRecordInput
+	if err := ctx.ShouldBindJSON(&financeForm); err != nil {
 		logger.GetLogger().Error("Invalid finance record request:", err)
 		ctx.JSON(http.StatusBadRequest, &models.CustomResponse{
 			Status: http.StatusBadRequest,
@@ -80,10 +80,10 @@ func (h *FinanceHandlers) AddFinanceRecord(ctx *gin.Context) {
 	var financeRecord models.FinanceRecord
 
 	financeRecord.UserID = uint(userID)
-	financeRecord.Amount = financeDTO.Amount
-	financeRecord.TransactionTypeID = financeDTO.TransactionTypeID
-	financeRecord.CategoryID = financeDTO.CategoryID
-	financeRecord.Note = financeDTO.Note
+	financeRecord.Amount = financeForm.Amount
+	financeRecord.TransactionTypeID = financeForm.TransactionTypeID
+	financeRecord.CategoryID = financeForm.CategoryID
+	financeRecord.Note = financeForm.Note
 
 	if err := h.financeRepo.Create(&financeRecord); err != nil {
 		logger.GetLogger().Error("Failed to create finance record:", err)

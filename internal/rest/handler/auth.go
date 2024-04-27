@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-finance-tracker/internal/models"
 	"go-finance-tracker/internal/repository"
-	"go-finance-tracker/internal/rest/dto"
+	"go-finance-tracker/internal/rest/form"
 	"go-finance-tracker/pkg/logger"
 	"go-finance-tracker/pkg/utils"
 	"net/http"
@@ -26,9 +26,9 @@ func NewAuthHandler(userRepo repository.UserRepo, roleRepo repository.RoleRepo) 
 }
 
 func (h *AuthHandlers) Register(ctx *gin.Context) {
-	var registerDTO form.RegisterInput
+	var registerForm form.RegisterInput
 
-	if err := ctx.ShouldBindJSON(&registerDTO); err != nil {
+	if err := ctx.ShouldBindJSON(&registerForm); err != nil {
 		logger.GetLogger().Error("Invalid registration request:", err)
 		ctx.JSON(http.StatusBadRequest, &models.CustomResponse{
 			Status: http.StatusBadRequest,
@@ -37,7 +37,7 @@ func (h *AuthHandlers) Register(ctx *gin.Context) {
 		return
 	}
 
-	if err := validate(registerDTO); err != nil {
+	if err := validate(registerForm); err != nil {
 		logger.GetLogger().Error("Invalid registration request:", err)
 		ctx.JSON(http.StatusBadRequest, &models.CustomResponse{
 			Status: http.StatusBadRequest,
@@ -46,9 +46,9 @@ func (h *AuthHandlers) Register(ctx *gin.Context) {
 		return
 	}
 
-	_, err := h.UserRepo.GetUserByUsername(registerDTO.Username)
+	_, err := h.UserRepo.GetUserByUsername(registerForm.Username)
 	if err == nil {
-		logger.GetLogger().Error("Account already registered for username:", registerDTO.Username)
+		logger.GetLogger().Error("Account already registered for username:", registerForm.Username)
 		ctx.JSON(http.StatusBadRequest, &models.CustomResponse{
 			Status:  http.StatusBadRequest,
 			Message: "The account is already registered",
@@ -57,10 +57,10 @@ func (h *AuthHandlers) Register(ctx *gin.Context) {
 	}
 
 	var user models.User
-	user.Name = registerDTO.Name
-	user.Surname = registerDTO.Surname
-	user.Username = registerDTO.Username
-	user.Email = registerDTO.Email
+	user.Name = registerForm.Name
+	user.Surname = registerForm.Surname
+	user.Username = registerForm.Username
+	user.Email = registerForm.Email
 	user.TotalMoney = 0
 
 	role, err := h.RoleRepo.GetByName("USER")
@@ -74,7 +74,7 @@ func (h *AuthHandlers) Register(ctx *gin.Context) {
 	}
 	user.Roles = append(user.Roles, *role)
 
-	hashedPassword, err := utils.HashPassword(registerDTO.Password)
+	hashedPassword, err := utils.HashPassword(registerForm.Password)
 	if err != nil {
 		logger.GetLogger().Error("Unable to hash the password")
 		ctx.JSON(http.StatusInternalServerError, &models.CustomResponse{
@@ -120,9 +120,9 @@ func (h *AuthHandlers) Register(ctx *gin.Context) {
 }
 
 func (h *AuthHandlers) Login(ctx *gin.Context) {
-	var loginDTO form.LoginInput
+	var loginForm form.LoginInput
 
-	if err := ctx.ShouldBindJSON(&loginDTO); err != nil {
+	if err := ctx.ShouldBindJSON(&loginForm); err != nil {
 		logger.GetLogger().Error("Invalid login request:", err)
 		ctx.JSON(http.StatusBadRequest, &models.CustomResponse{
 			Status: http.StatusBadRequest,
@@ -131,7 +131,7 @@ func (h *AuthHandlers) Login(ctx *gin.Context) {
 		return
 	}
 
-	user, err := h.UserRepo.GetUserByUsername(loginDTO.Username)
+	user, err := h.UserRepo.GetUserByUsername(loginForm.Username)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserNotFound) {
 			ctx.JSON(http.StatusNotFound, &models.CustomResponse{
@@ -145,7 +145,7 @@ func (h *AuthHandlers) Login(ctx *gin.Context) {
 		})
 	}
 
-	if !utils.CheckPasswordHash(loginDTO.Password, user.Password) {
+	if !utils.CheckPasswordHash(loginForm.Password, user.Password) {
 		logger.GetLogger().Error("Bad credentials for username:", user.Username)
 		ctx.JSON(http.StatusBadRequest, &models.CustomResponse{
 			Status:  http.StatusBadRequest,
