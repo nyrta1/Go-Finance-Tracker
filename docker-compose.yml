@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+  postgres:
+    container_name: gft-postgres
+    image: postgres:15-alpine
+    volumes:
+      - 'pg-data:/var/lib/postgresql/data'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB: 'gft'
+    ports:
+      - '15432:5432'
+#  redis:
+#    container_name: redis
+#    image: 'redis:alpine'
+#    expose:
+#      - "6379:6379"
+#    volumes:
+#      - "redis-data:/data"
+
+volumes:
+  pg-data:
+#  redis-data:
