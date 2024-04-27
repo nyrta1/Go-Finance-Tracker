@@ -26,7 +26,7 @@ func NewAuthHandler(userRepo repository.UserRepo, roleRepo repository.RoleRepo) 
 }
 
 func (h *AuthHandlers) Register(ctx *gin.Context) {
-	var registerDTO dto.RegisterInput
+	var registerDTO form.RegisterInput
 
 	if err := ctx.ShouldBindJSON(&registerDTO); err != nil {
 		logger.GetLogger().Error("Invalid registration request:", err)
@@ -120,7 +120,7 @@ func (h *AuthHandlers) Register(ctx *gin.Context) {
 }
 
 func (h *AuthHandlers) Login(ctx *gin.Context) {
-	var loginDTO dto.LoginInput
+	var loginDTO form.LoginInput
 
 	if err := ctx.ShouldBindJSON(&loginDTO); err != nil {
 		logger.GetLogger().Error("Invalid login request:", err)

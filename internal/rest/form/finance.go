@@ -1,4 +1,4 @@
-package dto
+package form
 
 type FinanceRecordInput struct {
 	Amount            float64 `json:"amount"`

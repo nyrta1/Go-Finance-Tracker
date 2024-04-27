@@ -67,7 +67,7 @@ func (h *FinanceHandlers) AddFinanceRecord(ctx *gin.Context) {
 	}
 	userID, _ := strconv.Atoi(userIdStr.(string))
 
-	var financeDTO dto.FinanceRecordInput
+	var financeDTO form.FinanceRecordInput
 	if err := ctx.ShouldBindJSON(&financeDTO); err != nil {
 		logger.GetLogger().Error("Invalid finance record request:", err)
 		ctx.JSON(http.StatusBadRequest, &models.CustomResponse{

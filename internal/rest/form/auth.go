@@ -1,4 +1,4 @@
-package dto
+package form
 
 type LoginInput struct {
 	Username string `json:"username" validate:"required"`
